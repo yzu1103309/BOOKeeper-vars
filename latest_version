@@ -1,5 +1,5 @@
 {
-    "version": "beta-0.2.7",
-    "android_link": "https://expo.dev/preview/update?message=%5Bbeta-0.2.7%5D+Fix+for+Android+%28Prompt+issue%29.+First+release+of+grouping+feature+%28In+Dev%29&updateRuntimeVersion=beta-0.2.7&createdAt=2025-10-12T17%3A05%3A31.235Z&slug=exp&projectId=ca43d25b-7343-4ba5-85cb-4a4db598af61&group=fcc98df2-40f7-4776-94bc-239c8a82104b",
-    "ios_link": "https://expo.dev/preview/update?message=%5Bbeta-0.2.7%5D+Fix+for+Android+%28Prompt+issue%29.+First+release+of+grouping+feature+%28In+Dev%29&updateRuntimeVersion=beta-0.2.7&createdAt=2025-10-12T17%3A05%3A31.235Z&slug=exp&projectId=ca43d25b-7343-4ba5-85cb-4a4db598af61&group=fcc98df2-40f7-4776-94bc-239c8a82104b"
+    "version": "beta-0.2.7.1",
+    "android_link": "https://expo.dev/preview/update?message=%5Bbeta-0.2.7.1%5D+New+Version+Prompt%2C+Bookset+Delete&updateRuntimeVersion=beta-0.2.7.1&createdAt=2025-10-14T16%3A37%3A34.124Z&slug=exp&projectId=ca43d25b-7343-4ba5-85cb-4a4db598af61&group=04ffdd7a-fa04-4c3f-9f6e-1375b4da4269",
+    "ios_link": "https://expo.dev/preview/update?message=%5Bbeta-0.2.7.1%5D+New+Version+Prompt%2C+Bookset+Delete&updateRuntimeVersion=beta-0.2.7.1&createdAt=2025-10-14T16%3A37%3A34.124Z&slug=exp&projectId=ca43d25b-7343-4ba5-85cb-4a4db598af61&group=04ffdd7a-fa04-4c3f-9f6e-1375b4da4269"
 }
