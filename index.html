@@ -15,6 +15,7 @@
       --primary-hover: #1d4ed8;
       --border: #e5e7eb;
       --shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+      --error: #ef4444; /* 新增錯誤提示顏色 */
     }
 
     * {
@@ -33,7 +34,8 @@
     }
 
     .card {
-      width: min(92vw, 560px);
+      width: 80vw;
+      max-width: 600px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 20px;
@@ -66,7 +68,7 @@
     }
 
     .version {
-      margin: 0 0 24px;
+      margin: 0 0 24px 8px;
       font-size: 18px;
       color: var(--muted);
     }
@@ -81,11 +83,12 @@
       border-radius: 16px;
       padding: 18px;
       background: #fcfcff;
+      text-align: center;
     }
 
     .step h2 {
       margin: 0 0 10px;
-      font-size: 18px;
+      font-size: 16px;
     }
 
     .step p {
@@ -110,20 +113,35 @@
       background: var(--primary-hover);
     }
 
-    .fallback-link {
-      margin-top: 12px;
-      word-break: break-all;
-    }
-
-    .note {
-      margin-top: 20px;
-      font-size: 13px;
-      color: var(--muted);
-      line-height: 1.5;
+    /* --- 新增：不支援裝置的訊息樣式 --- */
+    .not-supported {
+      text-align: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--error);
+      padding: 20px 0;
     }
 
     .hidden {
-      display: none;
+      display: none !important;
+    }
+
+    @media (min-width: 550px) {
+      .step {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: left;
+      }
+
+      .step h2 {
+        margin: 0;
+      }
+
+      a.button {
+        margin-top: 0;
+        flex-shrink: 0;
+      }
     }
   </style>
 </head>
@@ -136,26 +154,24 @@
 
     <p class="version" id="versionText">Loading update version...</p>
 
-    <section class="steps">
+    <div id="notSupportedMsg" class="not-supported hidden">
+      Not Supported on this device
+      <br />
+      <br />
+      Open this page in iOS or Android.
+    </div>
+
+    <section class="steps" id="stepsSection">
       <div class="step">
         <h2>Step 1: Install Expo Go</h2>
-        <p id="storeText">Detecting your device platform...</p>
         <a id="storeLink" class="button hidden" href="#" target="_blank" rel="noopener noreferrer">Install Expo Go</a>
       </div>
 
       <div class="step">
         <h2>Step 2: Open in Expo</h2>
-        <p>Open the latest app update in Expo Go.</p>
         <a id="expoLink" class="button hidden" href="#" target="_blank" rel="noopener noreferrer">Open in Expo</a>
-        <p id="expoFallback" class="fallback-link hidden"></p>
       </div>
     </section>
-
-    <p class="note">
-      Put this HTML file in the same folder as <code>latest_version</code> and <code>icon.png</code>.
-      If you open it directly with <code>file://</code>, some browsers may block reading <code>latest_version</code>.
-      In that case, serve the folder with a simple local web server.
-    </p>
   </main>
 
   <script>
@@ -175,11 +191,11 @@
 
     function setupStoreLink() {
       const platform = detectPlatform();
-      const storeText = document.getElementById('storeText');
       const storeLink = document.getElementById('storeLink');
+      const stepsSection = document.getElementById('stepsSection');
+      const notSupportedMsg = document.getElementById('notSupportedMsg');
 
       if (platform === 'android') {
-        storeText.textContent = 'Android device detected. Install Expo Go from Google Play.';
         storeLink.href = PLAY_STORE_LINK;
         storeLink.textContent = 'Open Google Play';
         storeLink.classList.remove('hidden');
@@ -187,22 +203,21 @@
       }
 
       if (platform === 'ios') {
-        storeText.textContent = 'iPhone or iPad detected. Install Expo Go from the App Store.';
         storeLink.href = APP_STORE_LINK;
         storeLink.textContent = 'Open App Store';
         storeLink.classList.remove('hidden');
         return platform;
       }
 
-      storeText.textContent = 'Could not detect Android or iOS. Choose the store manually: '; 
-      storeText.innerHTML = 'Could not detect Android or iOS. Use <a href="' + APP_STORE_LINK + '" target="_blank" rel="noopener noreferrer">App Store</a> or <a href="' + PLAY_STORE_LINK + '" target="_blank" rel="noopener noreferrer">Google Play</a>.';
+      // 當設備不是 iOS 也不是 Android 時
+      stepsSection.classList.add('hidden'); // 隱藏步驟區塊
+      notSupportedMsg.classList.remove('hidden'); // 顯示不支援訊息
       return platform;
     }
 
     async function loadVersionInfo() {
       const versionText = document.getElementById('versionText');
       const expoLink = document.getElementById('expoLink');
-      const expoFallback = document.getElementById('expoFallback');
       const platform = setupStoreLink();
 
       try {
@@ -215,26 +230,22 @@
         const versionNum = data.version || 'unknown';
         versionText.textContent = `Update version ${versionNum}`;
 
-        let expoUrl = data.android_link || data.ios_link || '';
-        if (platform === 'android' && data.android_link) {
-          expoUrl = data.android_link;
-        } else if (platform === 'ios' && data.ios_link) {
-          expoUrl = data.ios_link;
-        }
+        // 如果是不支援的平台，其實不需要設定 expoLink，但為了程式碼完整性保留判斷
+        if (platform !== 'unknown') {
+          let expoUrl = data.android_link || data.ios_link || '';
+          if (platform === 'android' && data.android_link) {
+            expoUrl = data.android_link;
+          } else if (platform === 'ios' && data.ios_link) {
+            expoUrl = data.ios_link;
+          }
 
-        if (expoUrl) {
-          expoLink.href = expoUrl;
-          expoLink.classList.remove('hidden');
-          expoFallback.classList.remove('hidden');
-          expoFallback.innerHTML = `Direct link: <a href="${expoUrl}" target="_blank" rel="noopener noreferrer">${expoUrl}</a>`;
-        } else {
-          expoFallback.classList.remove('hidden');
-          expoFallback.textContent = 'No Expo link found in latest_version.';
+          if (expoUrl) {
+            expoLink.href = expoUrl;
+            expoLink.classList.remove('hidden');
+          }
         }
       } catch (error) {
         versionText.textContent = 'Could not load update version.';
-        expoFallback.classList.remove('hidden');
-        expoFallback.textContent = 'Failed to read latest_version. Make sure this file is in the same folder and is served over HTTP.';
         console.error(error);
       }
     }
