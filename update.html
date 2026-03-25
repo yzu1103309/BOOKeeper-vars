@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BooKeeper Update</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --border: #e5e7eb;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .card {
+      width: min(92vw, 560px);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .app-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 16px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #f3f4f6;
+      border: 1px solid var(--border);
+    }
+
+    .app-title {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+
+    .version {
+      margin: 0 0 24px;
+      font-size: 18px;
+      color: var(--muted);
+    }
+
+    .steps {
+      display: grid;
+      gap: 18px;
+    }
+
+    .step {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      background: #fcfcff;
+    }
+
+    .step h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .step p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    a.button {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      background: var(--primary);
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.15s ease;
+    }
+
+    a.button:hover {
+      background: var(--primary-hover);
+    }
+
+    .fallback-link {
+      margin-top: 12px;
+      word-break: break-all;
+    }
+
+    .note {
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="app-header">
+      <img class="app-icon" src="icon.png" alt="BooKeeper icon" />
+      <h1 class="app-title">BooKeeper</h1>
+    </div>
+
+    <p class="version" id="versionText">Loading update version...</p>
+
+    <section class="steps">
+      <div class="step">
+        <h2>Step 1: Install Expo Go</h2>
+        <p id="storeText">Detecting your device platform...</p>
+        <a id="storeLink" class="button hidden" href="#" target="_blank" rel="noopener noreferrer">Install Expo Go</a>
+      </div>
+
+      <div class="step">
+        <h2>Step 2: Open in Expo</h2>
+        <p>Open the latest app update in Expo Go.</p>
+        <a id="expoLink" class="button hidden" href="#" target="_blank" rel="noopener noreferrer">Open in Expo</a>
+        <p id="expoFallback" class="fallback-link hidden"></p>
+      </div>
+    </section>
+
+    <p class="note">
+      Put this HTML file in the same folder as <code>latest_version</code> and <code>icon.png</code>.
+      If you open it directly with <code>file://</code>, some browsers may block reading <code>latest_version</code>.
+      In that case, serve the folder with a simple local web server.
+    </p>
+  </main>
+
+  <script>
+    const APP_STORE_LINK = 'https://apps.apple.com/app/expo-go/id982107779';
+    const PLAY_STORE_LINK = 'https://play.google.com/store/apps/details?id=host.exp.exponent';
+
+    function detectPlatform() {
+      const ua = navigator.userAgent || '';
+      if (/android/i.test(ua)) {
+        return 'android';
+      }
+      if (/iPhone|iPad|iPod/i.test(ua)) {
+        return 'ios';
+      }
+      return 'unknown';
+    }
+
+    function setupStoreLink() {
+      const platform = detectPlatform();
+      const storeText = document.getElementById('storeText');
+      const storeLink = document.getElementById('storeLink');
+
+      if (platform === 'android') {
+        storeText.textContent = 'Android device detected. Install Expo Go from Google Play.';
+        storeLink.href = PLAY_STORE_LINK;
+        storeLink.textContent = 'Open Google Play';
+        storeLink.classList.remove('hidden');
+        return platform;
+      }
+
+      if (platform === 'ios') {
+        storeText.textContent = 'iPhone or iPad detected. Install Expo Go from the App Store.';
+        storeLink.href = APP_STORE_LINK;
+        storeLink.textContent = 'Open App Store';
+        storeLink.classList.remove('hidden');
+        return platform;
+      }
+
+      storeText.textContent = 'Could not detect Android or iOS. Choose the store manually: '; 
+      storeText.innerHTML = 'Could not detect Android or iOS. Use <a href="' + APP_STORE_LINK + '" target="_blank" rel="noopener noreferrer">App Store</a> or <a href="' + PLAY_STORE_LINK + '" target="_blank" rel="noopener noreferrer">Google Play</a>.';
+      return platform;
+    }
+
+    async function loadVersionInfo() {
+      const versionText = document.getElementById('versionText');
+      const expoLink = document.getElementById('expoLink');
+      const expoFallback = document.getElementById('expoFallback');
+      const platform = setupStoreLink();
+
+      try {
+        const response = await fetch('./latest_version', { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error('Failed to load latest_version');
+        }
+
+        const data = await response.json();
+        const versionNum = data.version || 'unknown';
+        versionText.textContent = `Update version ${versionNum}`;
+
+        let expoUrl = data.android_link || data.ios_link || '';
+        if (platform === 'android' && data.android_link) {
+          expoUrl = data.android_link;
+        } else if (platform === 'ios' && data.ios_link) {
+          expoUrl = data.ios_link;
+        }
+
+        if (expoUrl) {
+          expoLink.href = expoUrl;
+          expoLink.classList.remove('hidden');
+          expoFallback.classList.remove('hidden');
+          expoFallback.innerHTML = `Direct link: <a href="${expoUrl}" target="_blank" rel="noopener noreferrer">${expoUrl}</a>`;
+        } else {
+          expoFallback.classList.remove('hidden');
+          expoFallback.textContent = 'No Expo link found in latest_version.';
+        }
+      } catch (error) {
+        versionText.textContent = 'Could not load update version.';
+        expoFallback.classList.remove('hidden');
+        expoFallback.textContent = 'Failed to read latest_version. Make sure this file is in the same folder and is served over HTTP.';
+        console.error(error);
+      }
+    }
+
+    loadVersionInfo();
+  </script>
+</body>
+</html>
